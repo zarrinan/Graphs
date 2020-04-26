@@ -42,7 +42,7 @@ class Graph:
         # create a Set for visited_vertices
         visited_vertices = set()
         # while the plan_to_visit queue is not Empty:
-        while plan_to_visit.size() > 0:
+        while plan_to_visit.queue:
             # dequeue the first vertex on the queue
             current_vertex = plan_to_visit.dequeue()
             # if its not been visited
@@ -67,7 +67,7 @@ class Graph:
         # create a Set for visited_vertices
         visited_vertices = set()
         # while the plan_to_visit stack is not Empty:
-        while plan_to_visit.size() > 0:
+        while plan_to_visit.stack:
             # pop the first vertex from the stack
             current_vertex = plan_to_visit.pop()
             # if its not been visited
@@ -81,14 +81,24 @@ class Graph:
                     if neighbor not in visited_vertices:
                         plan_to_visit.push(neighbor)
 
-    def dft_recursive(self, starting_vertex):
+    def dft_recursive(self, starting_vertex, visited=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
 
         This should be done using recursion.
         """
-        pass  # TODO
+        # Initial case
+        if not visited:
+            visited = set()
+
+        visited.add(starting_vertex)
+        print(starting_vertex)
+
+        # Recursive case
+        for neighbor in self.get_neighbors(starting_vertex):
+            if neighbor not in visited:
+                self.dft_recursive(neighbor, visited)
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -102,7 +112,7 @@ class Graph:
         # create a set for visited vertices
         visited_vertices = set()
         # while the queue is not empty
-        while neighbors_to_visit.size() > 0:
+        while neighbors_to_visit.queue:
             # dequeue the first PATH in the queue 
             current_path = neighbors_to_visit.dequeue() 
             # grab the last vertex in the path
@@ -124,9 +134,6 @@ class Graph:
                     # add the new path to the queue
                     neighbors_to_visit.enqueue(new_path)
 
-``
-        pass  # TODO
-
     def dfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing a path from
@@ -142,7 +149,7 @@ class Graph:
         # add the first vertex, and an empty list indicating that we have not been to any other vertices yet
         neighbors_to_visit.push((starting_vertex, []))
         # loop through the stack
-        while neighbors_to_visit.size() > 0:
+        while neighbors_to_visit.stack:
             # This will have (current_vertex, path)
             current_vertex_plus_path = neighbors_to_visit.pop()
             # pull out the current vertex so its easier to read
@@ -165,7 +172,7 @@ class Graph:
                     updated_path = current_path + [current_vertex]
                     neighbors_to_visit.push((neighbor, updated_path))
 
-    def dfs_recursive(self, starting_vertex, destination_vertex):
+    def dfs_recursive(self, starting_vertex, destination_vertex, visited=None, path=None):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -173,7 +180,23 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        if not visited:
+            visited = set()
+        visited = set(visited)
+        if not path:
+            path = []
+
+        visited.add(starting_vertex)
+        new_path = path.append(starting_vertex)
+        if starting_vertex == destination_vertex:
+            return new_path
+
+        for neighbor in self.get_neighbors(starting_vertex):
+            if neighbor not in visited:
+                neighbor_path = \
+                    self.dfs_recursive(neighbor, destination_vertex, new_path)
+                if neighbor_path:
+                    return neighbor_path
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
