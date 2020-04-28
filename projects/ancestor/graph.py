@@ -172,8 +172,7 @@ class Graph:
                     updated_path = current_path + [current_vertex]
                     neighbors_to_visit.push((neighbor, updated_path))
 
-    def dfs_recursive(self, starting_vertex, destination_vertex, visited=None,
-                      path=None):
+    def dfs_recursive(self, starting_vertex, destination_vertex, visited=None, path=None):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -183,20 +182,21 @@ class Graph:
         """
         if not visited:
             visited = set()
-        if path is None:
+        visited = set(visited)
+        if not path:
             path = []
+
         visited.add(starting_vertex)
-        path = path + [starting_vertex]
+        new_path = path.append(starting_vertex)
         if starting_vertex == destination_vertex:
-            return path
+            return new_path
+
         for neighbor in self.get_neighbors(starting_vertex):
             if neighbor not in visited:
-                new_path = self.dfs_recursive(neighbor, destination_vertex,
-                                              visited, path)
-                if new_path:
-                    return new_path
-        return None
-
+                neighbor_path = \
+                    self.dfs_recursive(neighbor, destination_vertex, new_path)
+                if neighbor_path:
+                    return neighbor_path
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
