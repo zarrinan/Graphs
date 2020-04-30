@@ -1,6 +1,28 @@
+import random
+import itertools
+
+
+class Queue():
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, value):
+        self.queue.append(value)
+
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+
+    def size(self):
+        return len(self.queue)
+
+
 class User:
     def __init__(self, name):
         self.name = name
+
 
 class SocialGraph:
     def __init__(self):
@@ -43,10 +65,13 @@ class SocialGraph:
         self.users = {}
         self.friendships = {}
         # !!!! IMPLEMENT ME
-
-        # Add users
-
-        # Create friendships
+        for i in range(0, num_users):
+            self.add_user(f"User {i}")
+        possible_friendships = list(itertools.combinations(self.users, 2))
+        random.shuffle(possible_friendships)
+        for i in range(num_users * avg_friendships // 2):
+            friendship = possible_friendships[i]
+            self.add_friendship(friendship[0], friendship[1])
 
     def get_all_social_paths(self, user_id):
         """
@@ -59,12 +84,35 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        neighbors_to_visit = Queue()
+        neighbors_to_visit.enqueue([user_id])
+        while neighbors_to_visit.size() > 0:
+            # dequeue the first path
+            current_path = neighbors_to_visit.dequeue()
+            # Grab the last vertex
+            current_vertex = current_path[-1]
+            # if it has not been visited
+            if current_vertex not in visited:
+                # when we reach the unvisited vertex, add it to visited dict
+                # but also, add the whole path that lead us here
+                visited[current_vertex] = current_path
+                # get all neighbors and add the path + the neighbor to the queue
+                for neighbor in self.friendships[current_vertex]:
+                    path_copy = current_path.copy()
+                    path_copy.append(neighbor)
+                    neighbors_to_visit.enqueue(path_copy)
+
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
-    print(sg.friendships)
+    sg.populate_graph(1000, 5)
     connections = sg.get_all_social_paths(1)
-    print(connections)
+    print(f"Users in extended social network: {len(connections) - 1}")
+
+    total_social_paths = 0
+    for user_id in connections:
+        total_social_paths += len(connections[user_id])
+    print(f"Avg length of social path: {total_social_paths / len(connections)}")
+
